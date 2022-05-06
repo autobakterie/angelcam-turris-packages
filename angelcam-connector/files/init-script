@@ -14,7 +14,8 @@ start_service() {
     mkdir -m 0755 -p $VAR_DIR
     mkdir -m 0755 -p $RUN_DIR
     procd_open_instance
-    procd_set_param command /usr/bin/angelcam-connector -d \
+    procd_set_param command /usr/bin/angelcam-connector arr-rs.angelcam.com:8900 \
+        -D br-lan \
         --log-stderr \
         --config-file=$CFG_DIR/config.json \
         --config-file-skel=$CFG_DIR/config-skel.json \
