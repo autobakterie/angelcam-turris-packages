@@ -14,7 +14,7 @@ include $(INCLUDE_DIR)/package.mk
 ifeq ($(CONFIG_TARGET_PROFILE),"DEVICE_cznic_turris-omnia")
   RUST_TARGET := armv7-unknown-linux-musleabihf
 else
-  RUST_TARGET := $(CONFIG_ARCH)-unknown-linux-$(CONFIG_TARGET_SUFFIX)
+  RUST_TARGET := $(shell echo $(CONFIG_ARCH)-unknown-linux-$(CONFIG_TARGET_SUFFIX))
 endif
 
 define Package/angelcam-connector

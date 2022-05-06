@@ -13,7 +13,7 @@ ADDITIONAL_TARGETS :=
 ifeq ($(CONFIG_TARGET_PROFILE),"DEVICE_cznic_turris-omnia")
   ADDITIONAL_TARGETS += armv7-unknown-linux-musleabihf
 else
-  ADDITIONAL_TARGETS += $(CONFIG_ARCH)-unknown-linux-$(CONFIG_TARGET_SUFFIX)
+  ADDITIONAL_TARGETS += $(shell echo $(CONFIG_ARCH)-unknown-linux-$(CONFIG_TARGET_SUFFIX))
 endif
 
 include $(INCLUDE_DIR)/host-build.mk
