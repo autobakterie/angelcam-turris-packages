@@ -1,0 +1,33 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=00
+
+USE_PROCD=1
+
+APP_DIR=/usr/local/angelcam-connector
+CFG_DIR=/etc/angelcam-connector
+VAR_DIR=/var/lib/angelcam-connector
+RUN_DIR=/var/run
+
+start_service() {
+    mkdir -m 0755 -p $VAR_DIR
+    mkdir -m 0755 -p $RUN_DIR
+    procd_open_instance
+    procd_set_param command /usr/bin/angelcam-connector -d \
+        --log-stderr \
+        --config-file=$CFG_DIR/config.json \
+        --config-file-skel=$CFG_DIR/config-skel.json \
+        --conn-state-file=$VAR_DIR/state \
+        --rtsp-paths=$CFG_DIR/rtsp-paths \
+        --mjpeg-paths=$CFG_DIR/mjpeg-paths \
+        --lock-file=$RUN_DIR/angelcam-connector.pid \
+        --identity-file=$VAR_DIR/identity.json \
+        -c $APP_DIR/ca.pem \
+        -c /usr/share/ca-certificates
+    procd_set_param respawn ${respawn_threshold:-3600} ${respawn_timeout:-1} ${respawn_retry:-5}
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param term_timeout 10
+    procd_close_instance
+}
