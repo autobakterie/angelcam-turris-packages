@@ -7,8 +7,10 @@ PKG_RELEASE := 1
 
 PKG_BUILD_DEPENDS := rust-lang/host
 
-ARROW_CLIENT_URL := https://github.com/angelcam/arrow-client.git
-ARROW_CLIENT_TAG := v0.10.1
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/angelcam/arrow-client.git
+PKG_SOURCE_VERSION:=v$(PKG_VERSION)
+PKG_MIRROR_HASH:=8651cb53d51642cac468948a0d40d2b04cec28e9ff046df254641b5a46cc8d87
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -42,18 +44,14 @@ endef
 export CARGO_CONFIG
 
 define Build/Prepare
-	mkdir -p $(PKG_BUILD_DIR)
-	cp files/init-script $(PKG_BUILD_DIR)
-	git clone $(ARROW_CLIENT_URL) $(PKG_BUILD_DIR)/arrow-client
-	cd $(PKG_BUILD_DIR)/arrow-client && git checkout $(ARROW_CLIENT_TAG)
-	mkdir $(PKG_BUILD_DIR)/arrow-client/.cargo
-	echo "$$$$CARGO_CONFIG" > $(PKG_BUILD_DIR)/arrow-client/.cargo/config
-	$(Build/Patch)
+	$(call Build/Prepare/Default)
+	mkdir $(PKG_BUILD_DIR)/.cargo
+	echo "$$$$CARGO_CONFIG" > $(PKG_BUILD_DIR)/.cargo/config
 endef
 
 define Build/Compile
 	(\
-		cd $(PKG_BUILD_DIR)/arrow-client && \
+		cd $(PKG_BUILD_DIR) && \
 		export OPENSSL_LIB_DIR=$(STAGING_DIR)/usr/lib && \
 		export OPENSSL_INCLUDE_DIR=$(STAGING_DIR)/usr/include && \
 		export CC_$(subst -,_,$(RUST_TARGET))=$(TARGET_CC) && \
@@ -82,12 +80,12 @@ define Package/angelcam-connector/install
 	$(INSTALL_DIR) $(1)/etc/angelcam-connector
 	$(INSTALL_DIR) $(1)/usr/local/angelcam-connector
 	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/arrow-client/target/$(RUST_TARGET)/release/arrow-client \
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/target/$(RUST_TARGET)/release/arrow-client \
 		$(1)/usr/bin/angelcam-connector
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/init-script $(1)/etc/init.d/angelcam-connector
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/arrow-client/ca.pem $(1)/usr/local/angelcam-connector/
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/arrow-client/rtsp-paths $(1)/etc/angelcam-connector/
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/arrow-client/mjpeg-paths $(1)/etc/angelcam-connector/
+	$(INSTALL_BIN) ./files/init-script $(1)/etc/init.d/angelcam-connector
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ca.pem $(1)/usr/local/angelcam-connector/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/rtsp-paths $(1)/etc/angelcam-connector/
+	$(INSTALL_DATA) $(PKG_BUILD_DIR)/mjpeg-paths $(1)/etc/angelcam-connector/
 	touch $(1)/etc/angelcam-connector/config.json
 	touch $(1)/etc/angelcam-connector/config-skel.json
 	chmod 600 $(1)/etc/angelcam-connector/config.json
