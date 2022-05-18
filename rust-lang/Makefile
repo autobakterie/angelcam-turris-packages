@@ -1,6 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME := rust-lang
+PKG_LICENSE := Apache-2.0/MIT
 PKG_VERSION := 1.60.0
 PKG_RELEASE := 1
 
