@@ -5,7 +5,10 @@ PKG_LICENSE := Apache-2.0/MIT
 PKG_VERSION := 1.60.0
 PKG_RELEASE := 1
 
-RUSTUP_URL := https://sh.rustup.rs
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_URL:=https://github.com/rust-lang/rustup.git
+PKG_SOURCE_VERSION:=1.24.3
+PKG_MIRROR_HASH:=ba8ebb610aaf76127a475ae899dee44e57e81341965f37b3c534196c933fc2df
 
 HOST_BUILD_DIR := $(BUILD_DIR_HOST)/$(PKG_NAME)-$(PKG_VERSION)
 
@@ -23,12 +26,12 @@ include $(INCLUDE_DIR)/package.mk
 Build/Compile:=:
 
 define Host/Prepare
-	wget $(RUSTUP_URL) -O $(HOST_BUILD_DIR)/rustup.sh
-	chmod 755 $(HOST_BUILD_DIR)/rustup.sh
+	$(call Host/Prepare/Default)
+	chmod 755 $(HOST_BUILD_DIR)/rustup-init.sh
 endef
 
 define Host/Compile
-	test -e $$$$HOME/.cargo/bin/rustup || $(HOST_BUILD_DIR)/rustup.sh -y --profile minimal
+	test -e $$$$HOME/.cargo/bin/rustup || $(HOST_BUILD_DIR)/rustup-init.sh -y --profile minimal
 	$$$$HOME/.cargo/bin/rustup toolchain install $(PKG_VERSION)
 	$$$$HOME/.cargo/bin/rustup target add --toolchain $(PKG_VERSION) $(ADDITIONAL_TARGETS)
 endef
