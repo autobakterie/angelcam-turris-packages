@@ -13,12 +13,7 @@ PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 PKG_MIRROR_HASH:=8651cb53d51642cac468948a0d40d2b04cec28e9ff046df254641b5a46cc8d87
 
 include $(INCLUDE_DIR)/package.mk
-
-ifeq ($(CONFIG_TARGET_PROFILE),"DEVICE_cznic_turris-omnia")
-  RUST_TARGET := armv7-unknown-linux-musleabihf
-else
-  RUST_TARGET := $(shell echo $(CONFIG_ARCH)-unknown-linux-$(CONFIG_TARGET_SUFFIX))
-endif
+include $(TOPDIR)/feeds/angelcampackages/rust-lang/files/rust-env.mk
 
 define Package/angelcam-connector
   TITLE := Angelcam Connector
@@ -31,22 +26,9 @@ define Package/angelcam-connector/description
   Angelcam Connector
 endef
 
-define CARGO_CONFIG
-[target.$(RUST_TARGET)]
-ar = "$(TARGET_AR)"
-linker = "$(TARGET_CC)"
-rustflags = [
-  "-C", "link-args=$(TARGET_LDFLAGS)",
-  "-C", "target-feature=-crt-static",
-]
-endef
-
-export CARGO_CONFIG
-
 define Build/Prepare
 	$(call Build/Prepare/Default)
-	mkdir $(PKG_BUILD_DIR)/.cargo
-	echo "$$$$CARGO_CONFIG" > $(PKG_BUILD_DIR)/.cargo/config
+	$(call Build/Prepare/Rust)
 endef
 
 define Build/Compile
@@ -54,9 +36,7 @@ define Build/Compile
 		cd $(PKG_BUILD_DIR) && \
 		export OPENSSL_LIB_DIR=$(STAGING_DIR)/usr/lib && \
 		export OPENSSL_INCLUDE_DIR=$(STAGING_DIR)/usr/include && \
-		export CC_$(subst -,_,$(RUST_TARGET))=$(TARGET_CC) && \
-		export CFLAGS_$(subst -,_,$(RUST_TARGET))="$(TARGET_CFLAGS)" && \
-		cargo +1.60.0 build \
+		cargo build \
 			--features "discovery threads" \
 			--release \
 			--target $(RUST_TARGET) \
