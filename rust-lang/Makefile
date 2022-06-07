@@ -10,8 +10,6 @@ PKG_SOURCE_URL:=https://github.com/rust-lang/rustup.git
 PKG_SOURCE_VERSION:=1.24.3
 PKG_MIRROR_HASH:=ba8ebb610aaf76127a475ae899dee44e57e81341965f37b3c534196c933fc2df
 
-HOST_BUILD_DIR := $(BUILD_DIR_HOST)/$(PKG_NAME)-$(PKG_VERSION)
-
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
 include ./files/rust-env.mk

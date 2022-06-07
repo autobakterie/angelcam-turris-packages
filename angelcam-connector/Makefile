@@ -13,17 +13,25 @@ PKG_SOURCE_VERSION:=v$(PKG_VERSION)
 PKG_MIRROR_HASH:=8651cb53d51642cac468948a0d40d2b04cec28e9ff046df254641b5a46cc8d87
 
 include $(INCLUDE_DIR)/package.mk
-include $(TOPDIR)/feeds/angelcampackages/rust-lang/files/rust-env.mk
+include ../rust-lang/files/rust-env.mk
 
 define Package/angelcam-connector
   TITLE := Angelcam Connector
   CATEGORY := Network
   SECTION := net
   DEPENDS := +libpcap +libopenssl
+  URL := https://github.com/angelcam/arrow-client
+  MAINTAINER := dev@angelcam.com
 endef
 
 define Package/angelcam-connector/description
-  Angelcam Connector
+  Angelcam Connector is a simple service that allows you to connect your IP
+  cameras to Angelcam Cloud easily even if you are behind a NAT. There is no
+  need for port-forwarding or a public IP address.
+
+  The application opens a secure connection to Angelcam Cloud and it works as
+  a proxy for your IP cameras. It periodically scans your local network in
+  order to keep track of your IP cameras.
 endef
 
 define Build/Prepare
